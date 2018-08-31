@@ -16,6 +16,7 @@ def index():
 
 @app.route('/cv')
 def cv():
+    global cv_last_build
     if cv_last_build is None or time.time() - cv_last_build > BUILD_INTERVAL:
         app.logger.info('Building cv')
         original_wd = os.getcwd()
@@ -26,6 +27,7 @@ def cv():
             subprocess.run('mv cv.pdf ../static/', shell=True)
         finally:
             os.chdir(original_wd)
+            cv_last_build = time.time()
     return redirect(url_for('static', filename='cv.pdf'))
 
 
