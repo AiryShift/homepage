@@ -59,6 +59,11 @@ def logout():
     return redirect(url_for('index'))
 
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect('login')
+
+
 @app.route('/cv')
 def cv():
     global cv_last_build
