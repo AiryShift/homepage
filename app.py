@@ -76,6 +76,25 @@ def cv():
     return redirect(url_for('static', filename='cv.pdf'))
 
 
+@app.route('/files')
+@login_required
+def files():
+    static_dir = os.path.join(os.getcwd(), 'private_static')
+    fs = []
+    for root, _, filenames in os.walk(static_dir):
+        for filename in filenames:
+            real_path = os.path.join(root, filename)
+            stripped = os.path.relpath(real_path, start=static_dir)
+            fs.append(stripped)
+    return render_template('files.html', fs=fs)
+
+
+@app.route('/files/<path:name>')
+@login_required
+def get_file(name):
+    return send_from_directory('private_static', name)
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
