@@ -2,16 +2,61 @@ import os
 import subprocess
 import time
 
-from flask import Flask, redirect, render_template, send_from_directory, url_for
+from flask import (Flask, abort, redirect, render_template, request,
+                   send_from_directory, url_for)
+from flask_login import (LoginManager, UserMixin, login_required, login_user,
+                         logout_user)
 
 cv_last_build = None
 BUILD_INTERVAL = 60 * 60
+MASTER_USERNAME = os.environ.get('MASTER_USERNAME', default='admin')
+MASTER_PASSWORD = os.environ.get('MASTER_PASSWORD', default='admin')
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', default=os.urandom(16))
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+class User(UserMixin):
+    def get_id(self):
+        return '0'
+
+
+MASTER_USER = User()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return MASTER_USER
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        username, password = request.form['username'], request.form['password']
+        app.logger.info(
+            'Login with user: {}, pass: {}'.format(username, password))
+        if username == MASTER_USERNAME and password == MASTER_PASSWORD:
+            login_user(MASTER_USER)
+            next_url = request.args.get('next')
+            return redirect(next_url or url_for('index'))
+        return render_template('login.html')
+    abort(404)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/cv')
@@ -32,4 +77,5 @@ def cv():
 
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()

@@ -20,6 +20,13 @@
 			<a class="nav-item nav-link" href="https://github.com/AiryShift">Github</a>
 			<a class="nav-item nav-link" href="http://lobster.artymove.me">Lobster Game</a>
 			<a class="nav-item nav-link" href="{{ url_for('cv') }}">Resume</a>
+			<div class="mr-2">
+				{% if current_user.is_authenticated %}
+				<a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+				{% else %}
+				<a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+				{% endif %}
+			</div>
 		</div>
 	</nav>
 
