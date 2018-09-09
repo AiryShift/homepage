@@ -49,6 +49,7 @@ def login():
         username, password = request.form['username'], request.form['password']
         app.logger.info(
             'Login with user: {}, pass: {}'.format(username, password))
+        time.sleep(0.5)
         if username == MASTER_USERNAME and password == MASTER_PASSWORD:
             login_user(MASTER_USER)
             next_url = request.args.get('next')
