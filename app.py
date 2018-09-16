@@ -6,8 +6,8 @@ import time
 
 from flask import (Flask, abort, redirect, render_template, request,
                    send_from_directory, url_for)
-from flask_login import (LoginManager, UserMixin, login_required, login_user,
-                         logout_user)
+from flask_login import (LoginManager, UserMixin, current_user, login_required,
+                         login_user, logout_user)
 
 cv_last_build = None
 BUILD_INTERVAL = 60 * 60
@@ -45,6 +45,8 @@ def page_not_found(e):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
