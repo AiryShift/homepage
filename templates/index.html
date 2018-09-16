@@ -2,4 +2,7 @@
 <h1>Hello</h1>
 
 <p>You can find my resume <a href="{{ url_for('cv') }}">here</a>.</p>
+{% if current_user.is_authenticated %}
+<p>Rebuild resume <a href="{{ url_for('rebuild_cv') }}">here</a>.</p>
+{% endif %}
 {% endblock body %}

@@ -72,21 +72,33 @@ def unauthorized():
     return abort(404)
 
 
+def build_cv():
+    global cv_last_build
+    app.logger.info('Building cv')
+    original_wd = os.getcwd()
+    try:
+        os.chdir(os.path.join(os.getcwd(), 'cv'))
+        subprocess.run('git pull && pdflatex cv.tex', shell=True)
+        subprocess.run('mv cv.pdf ../static/', shell=True)
+    except OSError:
+        subprocess.run('touch ../static/cv.pdf')
+    else:
+        cv_last_build = time.time()
+    finally:
+        os.chdir(original_wd)
+
+
 @app.route('/cv')
 def cv():
-    global cv_last_build
     if cv_last_build is None or time.time() - cv_last_build > BUILD_INTERVAL:
-        app.logger.info('Building cv')
-        original_wd = os.getcwd()
-        try:
-            os.chdir(os.path.join(os.getcwd(), 'cv'))
-            subprocess.run('git pull', shell=True)
-            subprocess.run('pdflatex cv.tex', shell=True)
-            subprocess.run('mv cv.pdf ../static/', shell=True)
-        finally:
-            os.chdir(original_wd)
-            cv_last_build = time.time()
+        build_cv()
     return redirect(url_for('static', filename='cv.pdf'))
+
+
+@app.route('/rebuild_cv')
+def rebuild_cv():
+    build_cv()
+    return redirect(url_for('cv'))
 
 
 @app.route('/files')
