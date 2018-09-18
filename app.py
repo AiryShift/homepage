@@ -51,14 +51,13 @@ def login():
         return render_template('login.html')
     elif request.method == 'POST':
         username, password = request.form['username'], request.form['password']
-        app.logger.info(
-            'Login with user: {}, pass: {}'.format(username, password))
+        app.logger.info('login user: {}, pass: {}'.format(username, password))
         time.sleep(0.5)
         if username == MASTER_USERNAME and password == MASTER_PASSWORD:
-            login_user(MASTER_USER)
+            login_user(MASTER_USER, remember=True)
             next_url = request.args.get('next')
             return redirect(next_url or url_for('index'))
-        return render_template('login.html')
+        return render_template('login.html', failed_login=True)
     abort(404)
 
 
@@ -71,7 +70,7 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return abort(404)
+    abort(404)
 
 
 def build_cv():
