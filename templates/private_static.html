@@ -2,6 +2,6 @@
 <h1>Files</h1>
 {% for file in fs %}
 <p class="mb-0">
-	<a href="{{ url_for('get_file', name=file) }}">{{ file }}</a>
+	<a href="{{ url_for('get_file_from_private_static', name=file) }}">{{ file }}</a>
 </p>
 {% endfor %} {% endblock body %}

@@ -102,9 +102,9 @@ def rebuild_cv():
     return redirect(url_for('cv'))
 
 
-@app.route('/files')
+@app.route('/private_static')
 @login_required
-def files():
+def private_static():
     static_dir = os.path.join(os.getcwd(), 'private_static')
     fs = []
     for root, _, filenames in os.walk(static_dir):
@@ -112,14 +112,20 @@ def files():
             real_path = os.path.join(root, filename)
             stripped = os.path.relpath(real_path, start=static_dir)
             fs.append(stripped)
-    return render_template('files.html', fs=fs)
+    return render_template('private_static.html', fs=fs)
 
 
-@app.route('/files/<path:name>')
-@login_required
-def get_file(name):
-    return send_from_directory('private_static', name)
+def get_file_from(path, login=False):
+    def func(name):
+        return send_from_directory(path, name)
+    if login:
+        func = login_required(func)
+    rule = '/{}/<path:name>'.format(path)
+    endpoint = 'get_file_from_{}'.format(path)
+    app.add_url_rule(rule, endpoint, func)
 
+get_file_from('private_static', login=True)
+get_file_from('anime')
 
 if __name__ == '__main__':
     app.debug = True
