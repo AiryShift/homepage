@@ -3,6 +3,7 @@
 import os
 import subprocess
 import time
+from datetime import datetime
 
 from flask import (Flask, abort, redirect, render_template, request,
                    send_from_directory, url_for)
@@ -102,6 +103,16 @@ def rebuild_cv():
     return redirect(url_for('cv'))
 
 
+def guess_file_icon(filename):
+    if filename.endswith('/'):
+        return 'folder'
+    if filename.endswith('.mp4'):
+        return 'movie'
+    if filename == '../':
+        return 'folder_open'
+    return 'note'
+
+
 def get_file_from(directory, login=False):
     endpoint = directory
 
@@ -119,14 +130,18 @@ def get_file_from(directory, login=False):
         # otherwise send the directory representation
         entries = []
         for entry in os.listdir(os.path.join(os.getcwd(), full_name)):
-            entry_name = os.path.join(name, entry)
-            if os.path.isdir(os.path.join(os.getcwd(), directory, entry_name)):
+            entry_path = os.path.join(name, entry)
+            entry_fullpath = os.path.join(os.getcwd(), directory, entry_path)
+            if os.path.isdir(entry_fullpath):
                 entry += '/'
-            entries.append((entry, entry_name))
+            last_access = datetime.utcfromtimestamp(
+                os.path.getmtime(entry_fullpath)).strftime('%c')
+            entries.append((entry, entry_path, last_access))
         if full_dirname != full_name:
-            entries.append(('../', os.path.join(name, '..')))
+            entries.append(('../', os.path.join(name, '..'), ''))
         return render_template('folder.html', title=directory,
-                               endpoint=endpoint, entries=entries)
+                               endpoint=endpoint, entries=entries,
+                               guesser=guess_file_icon)
 
     if login:
         func = login_required(func)
