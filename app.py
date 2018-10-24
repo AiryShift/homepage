@@ -139,6 +139,7 @@ def get_file_from(directory, login=False):
             entries.append((entry, entry_path, last_access))
         if full_dirname != full_name:
             entries.append(('../', os.path.join(name, '..'), ''))
+        entries.sort(key=lambda x: x[0])
         return render_template('folder.html', title=directory,
                                endpoint=endpoint, entries=entries,
                                guesser=guess_file_icon)
