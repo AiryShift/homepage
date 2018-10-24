@@ -102,27 +102,38 @@ def rebuild_cv():
     return redirect(url_for('cv'))
 
 
-@app.route('/private_static')
-@login_required
-def private_static():
-    static_dir = os.path.join(os.getcwd(), 'private_static')
-    fs = []
-    for root, _, filenames in os.walk(static_dir):
-        for filename in filenames:
-            real_path = os.path.join(root, filename)
-            stripped = os.path.relpath(real_path, start=static_dir)
-            fs.append(stripped)
-    return render_template('private_static.html', fs=fs)
+def get_file_from(directory, login=False):
+    endpoint = directory
 
-
-def get_file_from(path, login=False):
     def func(name):
-        return send_from_directory(path, name)
+        full_name = os.path.realpath(
+            os.path.join(os.getcwd(), directory, name))
+        full_dirname = os.path.abspath(directory)
+        if os.path.commonprefix((full_dirname, full_name)) != full_dirname:
+            abort(404)
+
+        # if it's a file, just send it
+        if os.path.isfile(full_name):
+            return send_from_directory(directory, name)
+
+        # otherwise send the directory representation
+        entries = []
+        for entry in os.listdir(os.path.join(os.getcwd(), full_name)):
+            entry_name = os.path.join(name, entry)
+            if os.path.isdir(os.path.join(os.getcwd(), directory, entry_name)):
+                entry += '/'
+            entries.append((entry, entry_name))
+        if full_dirname != full_name:
+            entries.append(('../', os.path.join(name, '..')))
+        return render_template('folder.html', title=directory,
+                               endpoint=endpoint, entries=entries)
+
     if login:
         func = login_required(func)
-    rule = '/{}/<path:name>'.format(path)
-    endpoint = 'get_file_from_{}'.format(path)
-    app.add_url_rule(rule, endpoint, func)
+    app.add_url_rule('/{}/<path:name>'.format(directory), endpoint, func)
+    app.add_url_rule('/{}/'.format(directory), endpoint,
+                     func, provide_automatic_options=None, defaults={'name': ''})
+
 
 get_file_from('private_static', login=True)
 get_file_from('anime')

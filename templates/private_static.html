@@ -1,7 +1,0 @@
-{% extends "base.html" %} {% block title %} Private files {% endblock title %} {% block body %}
-<h1>Files</h1>
-{% for file in fs %}
-<p class="mb-0">
-	<a href="{{ url_for('get_file_from_private_static', name=file) }}">{{ file }}</a>
-</p>
-{% endfor %} {% endblock body %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %} {% block title %} {{ title }} {% endblock title %} {% block body %}
+<h1>Files</h1>
+{% for entry, entry_name in entries %}
+<p class="mb-0">
+	<a href="{{ url_for(endpoint, name=entry_name) }}">{{ entry }}</a>
+</p>
+{% endfor %} {% endblock body %}
