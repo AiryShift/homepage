@@ -113,6 +113,16 @@ def guess_file_icon(filename):
     return 'note'
 
 
+def construct_fs_entry(entry, path, timestamp=None):
+    if timestamp is not None:
+        utc = datetime.utcfromtimestamp(timestamp)
+        access_datetime = utc.strftime('%Y-%m-%dT%H:%M:%S')
+        last_access = utc.strftime('%c')
+    else:
+        last_access = access_datetime = ''
+    return (entry, path, last_access, access_datetime)
+
+
 def get_file_from(directory, login=False):
     endpoint = directory
 
@@ -130,16 +140,16 @@ def get_file_from(directory, login=False):
         # otherwise send the directory representation
         entries = []
         for entry in os.listdir(os.path.join(os.getcwd(), full_name)):
-            entry_path = os.path.join(name, entry)
-            entry_fullpath = os.path.join(os.getcwd(), directory, entry_path)
-            if os.path.isdir(entry_fullpath):
+            path = os.path.join(name, entry)
+            abspath = os.path.join(os.getcwd(), directory, path)
+            if os.path.isdir(abspath):
                 entry += '/'
-            last_access = datetime.utcfromtimestamp(
-                os.path.getmtime(entry_fullpath)).strftime('%c')
-            entries.append((entry, entry_path, last_access))
-        if full_dirname != full_name:
-            entries.append(('../', os.path.join(name, '..'), ''))
+            mtime = os.path.getmtime(abspath)
+            entries.append((entry, path, mtime))
         entries.sort(key=lambda x: x[0])
+        entries = [construct_fs_entry(*entry) for entry in entries]
+        if full_dirname != full_name:
+            entries.append(construct_fs_entry('../', os.path.join('name', '..')))
         return render_template('folder.html', title=directory,
                                endpoint=endpoint, entries=entries,
                                guesser=guess_file_icon)

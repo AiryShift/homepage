@@ -15,7 +15,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for entry, entry_path, last_access in entries %}
+		{% for entry, entry_path, last_access, access_datetime in entries %}
 		<tr>
 			<th scope="row">
 				<i class="material-icons">{{ guesser(entry) }}</i>
@@ -24,7 +24,9 @@
 				<a href="{{ url_for(endpoint, name=entry_path) }}">{{ entry }}</a>
 			</td>
 			<td>
-				{{ last_access }}
+				{% if last_access != '' %}
+				<time datetime="{{ access_datetime }}" style="font-family:monospace;">{{ last_access }}</time>
+				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}
