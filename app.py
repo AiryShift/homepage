@@ -117,7 +117,7 @@ def construct_fs_entry(entry, path, timestamp=None):
     if timestamp is not None:
         utc = datetime.utcfromtimestamp(timestamp)
         access_datetime = utc.strftime('%Y-%m-%dT%H:%M:%S')
-        last_access = utc.strftime('%c')
+        last_access = utc.strftime('%Y-%m-%d %I:%M %p')
     else:
         last_access = access_datetime = ''
     return (entry, path, last_access, access_datetime)
@@ -149,7 +149,8 @@ def get_file_from(directory, login=False):
         entries.sort(key=lambda x: x[0])
         entries = [construct_fs_entry(*entry) for entry in entries]
         if full_dirname != full_name:
-            entries.append(construct_fs_entry('../', os.path.join('name', '..')))
+            back_entry = construct_fs_entry('../', os.path.join('name', '..'))
+            entries.insert(0, back_entry)
         return render_template('folder.html', title=directory,
                                endpoint=endpoint, entries=entries,
                                guesser=guess_file_icon)
