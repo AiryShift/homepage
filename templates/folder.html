@@ -11,11 +11,11 @@
 		<tr>
 			<th scope="col"></th>
 			<th scope="col">Name</th>
-			<th scope="col">Last Access Time</th>
+			<th scope="col">Last Modified Time</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for entry, entry_path, last_access, access_datetime in entries %}
+		{% for entry, entry_path, formatted, raw_datetime in entries %}
 		<tr>
 			<th scope="row">
 				<i class="material-icons">{{ guesser(entry) }}</i>
@@ -24,8 +24,8 @@
 				<a href="{{ url_for(endpoint, name=entry_path) }}">{{ entry }}</a>
 			</td>
 			<td>
-				{% if last_access != '' %}
-				<time datetime="{{ access_datetime }}" style="font-family:monospace;">{{ last_access }}</time>
+				{% if formatted != '' %}
+				<time datetime="{{ raw_datetime }}" style="font-family:monospace;">{{ formatted }}</time>
 				{% endif %}
 			</td>
 		</tr>

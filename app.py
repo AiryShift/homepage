@@ -116,11 +116,11 @@ def guess_file_icon(filename):
 def construct_fs_entry(entry, path, timestamp=None):
     if timestamp is not None:
         utc = datetime.utcfromtimestamp(timestamp)
-        access_datetime = utc.strftime('%Y-%m-%dT%H:%M:%S')
-        last_access = utc.strftime('%Y-%m-%d %I:%M %p')
+        raw_datetime = utc.strftime('%Y-%m-%dT%H:%M:%S')
+        formatted = utc.strftime('%Y-%m-%d %I:%M %p')
     else:
-        last_access = access_datetime = ''
-    return (entry, path, last_access, access_datetime)
+        formatted = raw_datetime = ''
+    return (entry, path, formatted, raw_datetime)
 
 
 def get_file_from(directory, login=False):
