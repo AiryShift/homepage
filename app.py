@@ -103,6 +103,11 @@ def rebuild_cv():
     return redirect(url_for('cv'))
 
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 def guess_file_icon(filename):
     if filename.endswith('/'):
         return 'folder'
