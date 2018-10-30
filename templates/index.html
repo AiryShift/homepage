@@ -2,6 +2,11 @@
 <h1>Hello</h1>
 
 <p>You can find my resume <a href="{{ url_for('cv') }}">here</a>.</p>
+<p>
+	I've also done some music arrangements before. A full list can be found <a href="{{ url_for('music') }}">here</a>.
+	Currently that list includes an arrangement of <a href="{{ url_for('music', name='grand_vals.pdf') }}">T&aacute;rrega's Gran Vals</a> for piano,
+	and one of <a href="{{ url_for('music', name='respighi_waltz') }}">Respighi's Valse Caressante</a> (from his 6 Pieces for Piano) for flute and guitar.
+</p>
 {% if current_user.is_authenticated %}
 <p>Rebuild resume <a href="{{ url_for('rebuild_cv') }}">here</a>.</p>
 {% endif %}

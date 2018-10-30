@@ -130,7 +130,12 @@ def get_file_from(directory, login=False):
         full_name = os.path.realpath(
             os.path.join(os.getcwd(), directory, name))
         full_dirname = os.path.abspath(directory)
+
+        # path occurs outside of this served directory
         if os.path.commonprefix((full_dirname, full_name)) != full_dirname:
+            abort(404)
+
+        if not os.path.exists(full_name):
             abort(404)
 
         # if it's a file, just send it
@@ -164,6 +169,7 @@ def get_file_from(directory, login=False):
 
 get_file_from('private_static', login=True)
 get_file_from('anime')
+get_file_from('music')
 
 if __name__ == '__main__':
     app.debug = True
