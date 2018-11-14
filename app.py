@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import os
 import subprocess
 import time
@@ -145,6 +146,7 @@ def get_file_from(directory, login=False):
 
         # if it's a file, just send it
         if os.path.isfile(full_name):
+            app.logger.info('sending {}'.format(name))
             return send_from_directory(directory, name)
 
         # otherwise send the directory representation
@@ -179,3 +181,8 @@ get_file_from('music')
 if __name__ == '__main__':
     app.debug = True
     app.run()
+else:
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+
+    app.logger.setLevel(gunicorn_logger.level)
