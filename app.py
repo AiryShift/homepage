@@ -109,6 +109,11 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('static', 'robots.txt')
+
+
 def guess_file_icon(filename):
     if filename.endswith('/'):
         return 'folder'
