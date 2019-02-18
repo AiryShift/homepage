@@ -40,6 +40,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/timetable')
+def calendar():
+    return render_template('timetable.html')
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
