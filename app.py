@@ -53,6 +53,7 @@ def page_not_found(e):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    global last_login
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == 'GET':
@@ -61,7 +62,7 @@ def login():
         username, password = request.form['username'], request.form['password']
         app.logger.info('login user: {}, pass: {}'.format(username, password))
         time.sleep(0.5)
-        if username == MASTER_USERNAME and password == MASTER_PASSWORD and abs(time.time() - last_login) > 5:
+        if username == MASTER_USERNAME and password == MASTER_PASSWORD and time.time() - last_login > 5:
             last_login = time.time()
             login_user(MASTER_USER, remember=True)
             next_url = request.args.get('next')
