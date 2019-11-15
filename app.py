@@ -12,6 +12,7 @@ from flask_login import (LoginManager, UserMixin, current_user, login_required,
                          login_user, logout_user)
 
 cv_last_build = None
+last_login = 0
 BUILD_INTERVAL = 60 * 60
 MASTER_USERNAME = os.environ.get('MASTER_USERNAME', default='admin')
 MASTER_PASSWORD = os.environ.get('MASTER_PASSWORD', default='admin')
@@ -60,7 +61,8 @@ def login():
         username, password = request.form['username'], request.form['password']
         app.logger.info('login user: {}, pass: {}'.format(username, password))
         time.sleep(0.5)
-        if username == MASTER_USERNAME and password == MASTER_PASSWORD:
+        if username == MASTER_USERNAME and password == MASTER_PASSWORD and abs(time.time() - last_login) > 5:
+            last_login = time.time()
             login_user(MASTER_USER, remember=True)
             next_url = request.args.get('next')
             return redirect(next_url or url_for('index'))
